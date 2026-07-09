@@ -1,6 +1,6 @@
 # Pokemon Champions Showdown Format Screenshot OCR
 
-Convert Pokemon Champions team detail screenshots into Pokemon Showdown import text.
+Convert Pokemon Champions team detail screenshots into Showdown format text.
 
 Live site: https://ppoiuy.github.io/pokemon-champions-showdown-format-screenshot-ocr/
 
@@ -15,7 +15,7 @@ Live site: https://ppoiuy.github.io/pokemon-champions-showdown-format-screenshot
 4. Enter your Gemini API key.
 5. Click **Import screenshots**.
 6. Review the results in the Team Editor and fix any OCR mistakes.
-7. Copy the generated Showdown paste from the export panel.
+7. Copy the generated Showdown format text from the export panel.
 
 ## Gemini API Key
 
