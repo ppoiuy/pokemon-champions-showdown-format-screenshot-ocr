@@ -49,18 +49,37 @@ h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; }
 
 .api-link {
   display: inline-flex;
-  margin-top: 10px;
+  align-items: center;
+  gap: 4px;
   color: var(--accent-2);
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(139, 226, 142, .35);
+  transition: opacity .15s;
 }
 
-.api-link:hover { text-decoration: underline; }
+.api-link:hover {
+  opacity: .8;
+  text-decoration-color: var(--accent-2);
+}
+
+.api-link::after {
+  content: '↗';
+  font-size: 11px;
+  opacity: .6;
+}
 
 .api-links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
   margin-top: 10px;
+  align-items: center;
+}
+
+.api-links-label {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .key-hint {
