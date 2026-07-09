@@ -220,12 +220,12 @@ function wireEvents() {
   els.customFormMatch.addEventListener('change', () => {
     state.customFormMatch = els.customFormMatch.checked;
   });
-  els.dropdownInputs.addEventListener('change', () => {
+  els.dropdownInputs.addEventListener('click', () => {
     state.dropdownInputs = els.dropdownInputs.checked;
     if (state.dropdownInputs) {
       if (state.data) buildDatalists();
     } else {
-      els.datalistContainer.innerHTML = '';
+      if (els.datalistContainer) els.datalistContainer.innerHTML = '';
     }
     renderTeamEditor();
   });
