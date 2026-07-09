@@ -163,7 +163,10 @@ function init() {
   initChampionsSets();
   loadShowdownData().then(() => {
     validateAndRender();
-    if (state.dropdownInputs) buildDatalists();
+    if (state.dropdownInputs) {
+      buildDatalists();
+      renderTeamEditor();
+    }
   }).catch(err => {
     setWarnings([{ kind: 'bad', text: `Failed to load validation data: ${err.message}` }]);
   });
@@ -219,7 +222,11 @@ function wireEvents() {
   });
   els.dropdownInputs.addEventListener('change', () => {
     state.dropdownInputs = els.dropdownInputs.checked;
-    if (state.dropdownInputs && state.data) buildDatalists();
+    if (state.dropdownInputs) {
+      if (state.data) buildDatalists();
+    } else {
+      els.datalistContainer.innerHTML = '';
+    }
     renderTeamEditor();
   });
 
