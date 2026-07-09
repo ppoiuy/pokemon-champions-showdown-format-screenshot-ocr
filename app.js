@@ -124,7 +124,8 @@ const state = {
   saveKey: hasSavedKey(),
   autoMega: false,
   fuzzyMatch: true,
-  formLookup: true,
+  formLookup: false,
+  customFormMatch: true,
   movesFile: null,
   statsFile: null,
   movesDataUrl: '',
@@ -154,7 +155,7 @@ function init() {
 
 function bindElements() {
   [
-    'geminiKey', 'saveKey', 'autoMega', 'fuzzyMatch', 'formLookup', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
+    'geminiKey', 'saveKey', 'autoMega', 'fuzzyMatch', 'formLookup', 'customFormMatch', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
     'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus', 'keyBanner'
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
@@ -165,6 +166,7 @@ function wireEvents() {
   els.autoMega.checked = state.autoMega;
   els.fuzzyMatch.checked = state.fuzzyMatch;
   els.formLookup.checked = state.formLookup;
+  els.customFormMatch.checked = state.customFormMatch;
 
   els.saveKey.addEventListener('change', () => {
     state.saveKey = els.saveKey.checked;
@@ -189,6 +191,9 @@ function wireEvents() {
   });
   els.formLookup.addEventListener('change', () => {
     state.formLookup = els.formLookup.checked;
+  });
+  els.customFormMatch.addEventListener('change', () => {
+    state.customFormMatch = els.customFormMatch.checked;
   });
 
   document.querySelectorAll('[data-pick]').forEach(btn => {
@@ -311,6 +316,7 @@ async function runOcr() {
     els.ocrStatus.innerHTML = '<span class="spinner"></span> Processing results...';
     mergeTeams(movesTeam, statsTeam);
     if (state.data && state.fuzzyMatch) correctTeamNames(state.team, state.data);
+    if (state.data && state.customFormMatch) applyCustomFormRules(state.team);
     renderTeamEditor();
     validateAndRender();
     els.ocrStatus.textContent = 'Done. Review and copy the paste below.';
@@ -714,6 +720,79 @@ function correctTeamNames(team, data) {
       const fixed = fuzzyMatchName(m, data.movesByName, 3);
       return fixed || m;
     });
+  }
+}
+
+const FORM_RULES = [
+  { species: 'Rotom', moves: ['Hydro Pump'], result: 'Rotom-Wash' },
+  { species: 'Rotom', moves: ['Air Slash'], result: 'Rotom-Fan' },
+  { species: 'Rotom', moves: ['Overheat'], result: 'Rotom-Heat' },
+  { species: 'Rotom', moves: ['Blizzard'], result: 'Rotom-Frost' },
+  { species: 'Rotom', moves: ['Leaf Storm'], result: 'Rotom-Mow' },
+  { species: 'Samurott', ability: 'Sharpness', result: 'Samurott-Hisui' },
+  { species: 'Samurott', moves: ['Ceaseless Edge', 'Dark Pulse', 'Lash Out', 'Snarl', 'Sucker Punch', 'Throat Chop'], result: 'Samurott-Hisui' },
+  { species: 'Arcanine', ability: 'Rock Head', result: 'Arcanine-Hisui' },
+  { species: 'Arcanine', moves: ['Head Smash', 'Power Gem', 'Rock Blast', 'Rock Slide', 'Rock Tomb', 'Sandstorm', 'Smack Down', 'Smart Strike', 'Stealth Rock', 'Stone Edge'], result: 'Arcanine-Hisui' },
+  { species: 'Avalugg', ability: 'Strong Jaw', result: 'Avalugg-Hisui' },
+  { species: 'Avalugg', moves: ['Ancient Power', 'Dig', 'Hard Press', 'Meteor Beam', 'Mountain Gale', 'Rock Blast', 'Sandstorm', 'Stealth Rock'], result: 'Avalugg-Hisui' },
+  { species: 'Decidueye', ability: 'Scrappy', result: 'Decidueye-Hisui' },
+  { species: 'Decidueye', moves: ['Aura Sphere', 'Brick Break', 'Bulk Up', 'Close Combat', 'Focus Blast', 'Focus Punch', 'Reversal', 'Rock Tomb', 'Scary Face', 'Taunt', 'Triple Arrows', 'Upper Hand'], result: 'Decidueye-Hisui' },
+  { species: 'Goodra', ability: 'Shell Armor', result: 'Goodra-Hisui' },
+  { species: 'Goodra', moves: ['Ancient Power', 'Flash Cannon', 'Gyro Ball', 'Heavy Slam', 'Ice Spinner', 'Iron Head', 'Lash Out', 'Rock Tomb', 'Sandstorm', 'Scary Face', 'Steel Beam'], result: 'Goodra-Hisui' },
+  { species: 'Typhlosion', ability: 'Frisk', result: 'Typhlosion-Hisui' },
+  { species: 'Typhlosion', moves: ['Calm Mind', 'Confuse Ray', 'Hex', 'Infernal Parade', 'Mystical Fire', 'Night Shade', 'Poltergeist', 'Spite'], result: 'Typhlosion-Hisui' },
+  { species: 'Zoroark', moves: ['Bitter Malice', 'Comeuppance', 'Curse', 'Focus Punch', 'Icy Wind', 'Phantom Force', 'Poltergeist', 'Shadow Sneak', 'Snowscape', 'Will-O-Wisp'], result: 'Zoroark-Hisui' },
+  { species: 'Slowbro', ability: 'Quick Draw', result: 'Slowbro-Galar' },
+  { species: 'Slowbro', moves: ['Acid Spray', 'Double-Edge', 'Gunk Shot', 'Haze', 'Ice Fang', 'Poison Jab', 'Power Gem', 'Rock Blast', 'Sandstorm', 'Scary Face', 'Shell Side Arm', 'Sludge Bomb', 'Sludge Wave', 'Smack Down', 'Toxic', 'Toxic Spikes', 'Venoshock'], result: 'Slowbro-Galar' },
+  { species: 'Slowking', ability: 'Curious Medicine', result: 'Slowking-Galar' },
+  { species: 'Slowking', moves: ['Acid Spray', 'Eerie Spell', 'Gunk Shot', 'Hex', 'Low Sweep', 'Poison Jab', 'Scary Face', 'Sludge Bomb', 'Sludge Wave', 'Snarl', 'Stomping Tantrum', 'Taunt', 'Toxic', 'Toxic Spikes', 'Venoshock'], result: 'Slowking-Galar' },
+  { species: 'Stunfisk', ability: 'Mimicry', result: 'Stunfisk-Galar' },
+  { species: 'Stunfisk', moves: ['Bind', 'Counter', 'Crunch', 'Flash Cannon', 'Ice Fang', 'Iron Defense', 'Metal Sound', 'Screech', 'Snap Trap', 'Steel Beam', 'Terrain Pulse'], result: 'Stunfisk-Galar' },
+  { species: 'Floette', result: 'Floette-Eternal' },
+  { species: 'Ninetales', ability: 'Snow Cloak', result: 'Ninetales-Alola' },
+  { species: 'Ninetales', ability: 'Snow Warning', result: 'Ninetales-Alola' },
+  { species: 'Raichu', ability: 'Surge Surfer', result: 'Raichu-Alola' },
+  { species: 'Meowstic', ability: 'Competitive', result: 'Meowstic-F' },
+  { species: 'Meowstic', moves: ['Extrasensory', 'Future Sight'], result: 'Meowstic-F' },
+  { species: 'Lycanroc', ability: 'Tough Claws', result: 'Lycanroc-Dusk' },
+  { species: 'Lycanroc', moves: ['Crush Claw', 'Focus Energy', 'Outrage'], result: 'Lycanroc-Dusk' },
+  { species: 'Lycanroc', ability: 'Vital Spirit', result: 'Lycanroc-Midnight' },
+  { species: 'Lycanroc', ability: 'No Guard', result: 'Lycanroc-Midnight' },
+  { species: 'Lycanroc', moves: ['Fire Punch', 'Fling', 'Focus Punch', 'Foul Play', 'Knock Off', 'Lash Out', 'Low Sweep', 'Payback', 'Shadow Claw', 'Thunder Punch', 'Upper Hand', 'Uproar'], result: 'Lycanroc-Midnight' },
+  { species: 'Tauros', moves: ['Aqua Jet', 'Chilling Water', 'Drill Run', 'Hydro Pump', 'Liquidation', 'Water Pulse', 'Wave Crash'], result: 'Tauros-Paldea-Aqua' },
+  { species: 'Tauros', moves: ['Fire Spin', 'Flame Charge', 'Flare Blitz', 'Overheat', 'Temper Flare', 'Will-O-Wisp'], result: 'Tauros-Paldea-Blaze' },
+];
+
+function applyCustomFormRules(team) {
+  for (const mon of team) {
+    const base = normalizeLookup(mon.species);
+    const movesLower = (mon.moves || []).map(m => normalizeLookup(m));
+    const abilityLower = normalizeLookup(mon.ability);
+
+    for (const rule of FORM_RULES) {
+      const ruleBase = normalizeLookup(rule.species);
+      if (base !== ruleBase) continue;
+      if (mon.species.includes('-')) continue;
+
+      let abilityMatch = false;
+      if (rule.ability) {
+        const ruleAbilities = Array.isArray(rule.ability) ? rule.ability : [rule.ability];
+        abilityMatch = ruleAbilities.some(a => normalizeLookup(a) === abilityLower);
+      }
+
+      let moveMatch = false;
+      if (rule.moves) {
+        moveMatch = rule.moves.some(m => movesLower.includes(normalizeLookup(m)));
+      }
+
+      const abilityNeeded = !!rule.ability;
+      const movesNeeded = !!rule.moves;
+
+      if ((!abilityNeeded || abilityMatch) && (!movesNeeded || moveMatch)) {
+        mon.species = rule.result;
+        break;
+      }
+    }
   }
 }
 
