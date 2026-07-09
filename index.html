@@ -36,7 +36,7 @@
       </div>
     </header>
 
-    <div id="keyBanner" class="key-banner">Enter your Gemini API key at the bottom of the page to enable OCR.</div>
+    <div id="keyBanner" class="key-banner">Enter your API key at the bottom of the page to enable OCR.</div>
 
     <details class="panel" open>
       <summary class="panel-head" style="cursor:pointer"><h2>Screenshot Location Instructions</h2></summary>
@@ -112,18 +112,25 @@
     </div>
 
     <details class="panel key-panel" id="keyPanel">
-      <summary class="panel-head" style="cursor:pointer"><h2>Gemini API Key</h2></summary>
+      <summary class="panel-head" style="cursor:pointer"><h2>AI Provider</h2></summary>
       <div class="key-grid">
         <label class="field">
+          <span>Provider</span>
+          <select id="aiProvider" class="team-input">
+            <option value="gemini">Google Gemini</option>
+            <option value="openai">OpenAI</option>
+          </select>
+        </label>
+        <label class="field">
           <span>API key</span>
-          <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="Enter your Gemini API key" />
+          <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="Enter your API key" />
         </label>
         <label class="save-toggle">
           <input id="saveKey" type="checkbox" />
           <span>Save key</span>
         </label>
       </div>
-      <p class="warning-inline">A Gemini API key is required. <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get a free API key</a></p>
+      <p class="warning-inline">A valid API key is required. <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get a Gemini key</a> · <a class="api-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">Get an OpenAI key</a></p>
     </details>
   </main>
 </body>

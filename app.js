@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'pcso_gemini_key';
+const PROVIDER_STORAGE_KEY = 'pcso_ai_provider';
 
 function loadSavedKey() {
   try { return localStorage.getItem(STORAGE_KEY) || ''; } catch { return ''; }
@@ -11,6 +12,12 @@ function setSavedKey(key) {
 }
 function removeSavedKey() {
   try { localStorage.removeItem(STORAGE_KEY); } catch {}
+}
+function loadSavedProvider() {
+  try { return localStorage.getItem(PROVIDER_STORAGE_KEY) || 'gemini'; } catch { return 'gemini'; }
+}
+function saveSavedProvider(provider) {
+  try { localStorage.setItem(PROVIDER_STORAGE_KEY, provider); } catch {}
 }
 
 const MOVES_STORAGE_KEY = 'pcso_moves_data';
@@ -122,6 +129,7 @@ const DEFAULT_TEAM = Array.from({ length: 6 }, (_, i) => ({
 const state = {
   geminiKey: loadSavedKey(),
   saveKey: hasSavedKey(),
+  aiProvider: loadSavedProvider(),
   autoMega: false,
   fuzzyMatch: true,
   formLookup: false,
@@ -155,7 +163,7 @@ function init() {
 
 function bindElements() {
   [
-    'geminiKey', 'saveKey', 'autoMega', 'fuzzyMatch', 'formLookup', 'customFormMatch', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
+    'geminiKey', 'saveKey', 'aiProvider', 'autoMega', 'fuzzyMatch', 'formLookup', 'customFormMatch', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
     'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus', 'keyBanner'
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
@@ -163,6 +171,7 @@ function bindElements() {
 function wireEvents() {
   els.geminiKey.value = state.geminiKey;
   els.saveKey.checked = state.saveKey;
+  els.aiProvider.value = state.aiProvider;
   els.autoMega.checked = state.autoMega;
   els.fuzzyMatch.checked = state.fuzzyMatch;
   els.formLookup.checked = state.formLookup;
@@ -176,6 +185,10 @@ function wireEvents() {
     state.geminiKey = els.geminiKey.value;
     if (state.saveKey) setSavedKey(state.geminiKey.trim());
     updateKeyBanner();
+  });
+  els.aiProvider.addEventListener('change', () => {
+    state.aiProvider = els.aiProvider.value;
+    saveSavedProvider(state.aiProvider);
   });
   for (const input of [els.geminiKey]) {
     input.addEventListener('copy', e => e.preventDefault());
@@ -301,7 +314,7 @@ async function runOcr() {
   }
   if (!state.geminiKey.trim()) {
     els.ocrStatus.textContent = '';
-    setWarnings([{ kind: 'bad', text: 'A Gemini API key is required. Open the "API Key" section at the bottom of the page and enter your key.' }]);
+    setWarnings([{ kind: 'bad', text: `A valid API key is required. Open the "AI Provider" section at the bottom of the page and enter your key.` }]);
     return;
   }
   if (state.saveKey) setSavedKey(state.geminiKey.trim());
@@ -553,6 +566,64 @@ function getMegaSpeciesFromItem(data, speciesEntry, item) {
   return targetName ? data.findSpecies(targetName) : null;
 }
 
+async function callAI(prompt, base64, mimeType, dataUrl) {
+  const provider = state.aiProvider || 'gemini';
+  const key = state.geminiKey.trim();
+
+  if (provider === 'openai') {
+    const body = {
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: dataUrl } }
+      ]}],
+      response_format: { type: 'json_object' },
+      temperature: 0.1,
+      max_tokens: 4096
+    };
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      let detail = '';
+      try { const err = await res.json(); detail = err.error?.message || ''; } catch {}
+      throw new Error(`OpenAI request failed (${res.status}${detail ? ': ' + detail : ''})`);
+    }
+    const json = await res.json();
+    const text = json.choices?.[0]?.message?.content || '';
+    if (!text) throw new Error('OpenAI returned an empty response.');
+    const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    return start >= 0 && end >= start ? cleaned.slice(start, end + 1) : cleaned;
+  }
+
+  // Default: Gemini
+  const body = {
+    contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64 } }, { text: prompt }] }],
+    generationConfig: { temperature: 0.1, maxOutputTokens: 4096, responseMimeType: 'application/json' }
+  };
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const err = await res.json(); detail = err.error?.message || ''; } catch {}
+    throw new Error(`Gemini request failed (${res.status}${detail ? ': ' + detail : ''})`);
+  }
+  const json = await res.json();
+  const text = json.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+  if (!text) throw new Error('Gemini returned an empty response.');
+  const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  return start >= 0 && end >= start ? cleaned.slice(start, end + 1) : cleaned;
+}
+
 async function extractTeamFromScreenshot(kind, dataUrl) {
   const mimeType = dataUrl.match(/^data:(.*?);base64,/i)?.[1] || 'image/png';
   const base64 = dataUrl.split(',')[1];
@@ -578,33 +649,10 @@ Use exact English names as shown.`
 
 Use exact English names as shown.`;
 
-  const body = {
-    contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64 } }, { text: prompt }] }],
-    generationConfig: {
-      temperature: 0.1,
-      maxOutputTokens: 4096,
-      responseMimeType: 'application/json'
-    }
-  };
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(state.geminiKey.trim())}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) {
-    let detail = '';
-    try { const err = await res.json(); detail = err.error?.message || ''; } catch {}
-    throw new Error(`Gemini request failed (${res.status}${detail ? ': ' + detail : ''})`);
-  }
-  const json = await res.json();
-  const text = json.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
-  if (!text) throw new Error('Gemini returned an empty response.');
-  const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-  const start = cleaned.indexOf('{');
-  const end = cleaned.lastIndexOf('}');
-  const parsed = JSON.parse(start >= 0 && end >= start ? cleaned.slice(start, end + 1) : cleaned);
+  const result = await callAI(prompt, base64, mimeType, dataUrl);
+  const parsed = JSON.parse(result);
   const team = parsed.team || [];
-  if (!Array.isArray(team) || team.length === 0) throw new Error(`Gemini returned no team data for ${kind} screen.`);
+  if (!Array.isArray(team) || team.length === 0) throw new Error(`AI returned no team data for ${kind} screen.`);
   return kind === 'stats' ? normalizeStatsTeam(team) : normalizeMovesTeam(team);
 }
 

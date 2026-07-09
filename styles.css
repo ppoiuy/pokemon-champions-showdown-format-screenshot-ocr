@@ -121,7 +121,7 @@ h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; }
   gap: 8px;
 }
 
-.field input, .export-box, .team-input {
+.field input, .field select, .export-box, .team-input {
   width: 100%;
   background: #0e1320;
   color: var(--text);
