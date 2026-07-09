@@ -11,8 +11,8 @@ Updated for Regulation M-B.
 1. Open the site.
 2. Take your screenshots:
    - From the Pokemon Champions home page: **Train** → **Replica Teams** → **Share Your Battle Teams** → choose a team → **View Details**
-   - Screenshot the **Moves & More** tab (shows all 6 Pokemon)
-   - Screenshot the **Stats** tab (shows all 6 Pokemon)
+   - Screenshot the **Moves & More** tab
+   - Screenshot the **Stats** tab
 3. Upload both screenshots.
 4. Enter your Gemini API key.
 5. Click **Import screenshots**.
