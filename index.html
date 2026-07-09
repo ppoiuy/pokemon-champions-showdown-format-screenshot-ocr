@@ -21,29 +21,10 @@
       </label>
     </header>
 
-    <details class="panel">
+    <details class="panel" open>
       <summary class="panel-head" style="cursor:pointer"><h2>How to get your screenshots</h2></summary>
       <p style="margin:0">From the Pokemon Champions home page: <strong>Train</strong> → <strong>Replica Teams</strong> → <strong>Share Your Battle Teams</strong> → choose a team → <strong>View Details</strong>. Screenshot the <strong>Moves &amp; More</strong> tab and the <strong>Stats</strong> tab for each Pokemon.</p>
     </details>
-
-    <section class="panel key-panel" id="keyPanel">
-      <div class="panel-head">
-        <h2>Gemini OCR</h2>
-        <span class="hint">Saved key enables vision OCR by default</span>
-      </div>
-      <div class="key-grid">
-        <label class="field">
-          <span>Gemini API key</span>
-          <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="Enter your Gemini API key" />
-        </label>
-        <label class="save-toggle">
-          <input id="saveKey" type="checkbox" />
-          <span>Save key</span>
-        </label>
-      </div>
-      <p class="warning-inline">A Gemini API key is required to use this tool.</p>
-      <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get a free API key from Google AI Studio</a>
-    </section>
 
     <div class="workbench">
       <div class="main-column">
@@ -99,12 +80,31 @@
       <aside class="panel export-panel">
         <div class="panel-head">
           <h2>Export</h2>
-          <button id="copyPaste" class="primary">Copy paste</button>
+          <button id="copyPaste" class="primary">Copy text</button>
         </div>
+        <div id="ocrStatus" class="ocr-status"></div>
         <textarea id="exportText" class="export-box" rows="18" spellcheck="false" placeholder="Your Showdown import paste appears here"></textarea>
         <div id="warningList" class="warnings"></div>
       </aside>
     </div>
+
+    <section class="panel key-panel" id="keyPanel">
+      <div class="panel-head">
+        <h2>Gemini API Key</h2>
+      </div>
+      <div class="key-grid">
+        <label class="field">
+          <span>Gemini API key</span>
+          <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="Enter your Gemini API key" />
+        </label>
+        <label class="save-toggle">
+          <input id="saveKey" type="checkbox" />
+          <span>Save key</span>
+        </label>
+      </div>
+      <p class="warning-inline">A Gemini API key is required.</p>
+      <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get a free API key from Google AI Studio</a>
+    </section>
   </main>
 </body>
 </html>

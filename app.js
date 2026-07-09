@@ -73,7 +73,7 @@ function init() {
 function bindElements() {
   [
     'geminiKey', 'saveKey', 'autoMega', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
-    'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel'
+    'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus'
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
 
@@ -188,20 +188,27 @@ async function runOcr() {
   }
   if (state.saveKey) setSavedKey(state.geminiKey.trim());
   els.runOcr.disabled = true;
-  els.runOcr.textContent = 'Working...';
+  els.runOcr.textContent = 'Importing...';
+  els.ocrStatus.textContent = 'Sending screenshots to Gemini...';
   try {
     const [movesTeam, statsTeam] = await Promise.all([
       extractTeamFromScreenshot('moves', state.movesDataUrl),
       extractTeamFromScreenshot('stats', state.statsDataUrl)
     ]);
+    els.ocrStatus.textContent = 'Processing results...';
     mergeTeams(movesTeam, statsTeam);
     renderTeamEditor();
     validateAndRender();
+    els.ocrStatus.textContent = 'Done. Review and copy the paste below.';
   } catch (err) {
+    els.ocrStatus.textContent = '';
     setWarnings([{ kind: 'bad', text: err.message || 'OCR failed.' }]);
   } finally {
     els.runOcr.disabled = false;
     els.runOcr.textContent = 'Import screenshots';
+    if (els.ocrStatus.textContent.startsWith('Sending') || els.ocrStatus.textContent.startsWith('Processing')) {
+      els.ocrStatus.textContent = 'Import failed.';
+    }
   }
 }
 

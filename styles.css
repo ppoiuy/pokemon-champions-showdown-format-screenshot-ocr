@@ -236,6 +236,28 @@ h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; }
   white-space: pre;
 }
 
+.ocr-status {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 1.4em;
+}
+
+.key-panel {
+  opacity: .75;
+  transition: opacity .15s;
+}
+.key-panel:hover,
+.key-panel:focus-within {
+  opacity: 1;
+}
+.key-panel .panel-head {
+  margin-bottom: 0;
+}
+.key-panel .key-grid {
+  margin-top: 10px;
+}
+
 @media (max-width: 900px) {
   .hero, .panel-head, .key-grid, .upload-grid, .team-grid, .team-subgrid, .moves-grid, .workbench { grid-template-columns: 1fr; display: grid; }
   .hero { align-items: start; }

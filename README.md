@@ -15,14 +15,14 @@ This tool is intended for quickly sharing or saving teams from Pokemon Champions
    - Screenshot the **Stats** tab.
 3. Add the `Moves & More` screenshot.
 4. Add the `Stats` screenshot.
-5. Enter a Gemini API key for best OCR results, or continue with the built-in Tesseract fallback.
+5. Enter your Gemini API key.
 6. Click `Import screenshots`.
 7. Review and manually fix any extracted fields if needed.
 8. Copy the generated Pokemon Showdown paste from the export panel.
 
 ## Gemini API Key
 
-Gemini OCR is recommended for better screenshot parsing accuracy.
+A Gemini API key is required to use this tool.
 
 Get a free API key from Google AI Studio:
 
@@ -46,6 +46,5 @@ Current validation uses Pokemon Showdown data as a baseline for Pokemon, move, i
 ## Current Limitations
 
 - OCR can make mistakes, so manual review is recommended.
-- Tesseract OCR fallback is less accurate than Gemini.
 - The screenshot layout is currently tuned for the standard team detail screens.
 - Move validation currently checks move existence, not full per-Pokemon learnset legality.
