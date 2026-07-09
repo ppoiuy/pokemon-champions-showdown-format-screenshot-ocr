@@ -571,10 +571,10 @@ function validateTeam(team, data, autoMega) {
   team.forEach((mon, idx) => {
     const perMonWarnings = [];
     const statTotal = STAT_KEYS.reduce((sum, key) => sum + clampInt(mon.statPoints?.[key] ?? 0, 0, 999), 0);
-    if (statTotal > 66) perMonWarnings.push({ slot: `Slot ${idx + 1}`, kind: 'bad', text: `stat points total ${statTotal} exceeds 66.` });
+    if (statTotal > 66) perMonWarnings.push({ slot: `Slot ${idx + 1}`, kind: 'bad', text: `Stat Points total ${statTotal} exceeds 66.` });
     for (const key of STAT_KEYS) {
       const n = clampInt(mon.statPoints?.[key] ?? 0, 0, 999);
-      if (n > 32) perMonWarnings.push({ slot: `Slot ${idx + 1}`, kind: 'bad', text: `${STAT_NAMES[key]} stat points ${n} exceeds 32.` });
+      if (n > 32) perMonWarnings.push({ slot: `Slot ${idx + 1}`, kind: 'bad', text: `${STAT_NAMES[key]} Stat Points ${n} exceeds 32.` });
     }
 
     const species = normalizeSpecies(mon.species);
