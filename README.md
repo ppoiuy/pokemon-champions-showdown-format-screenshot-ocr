@@ -1,4 +1,4 @@
-# Pokemon Champions Showdown Format Screenshot OCR
+# Pokemon Champions Screenshot OCR into Showdown Format 
 
 Convert Pokemon Champions team detail screenshots into Showdown format text.
 
