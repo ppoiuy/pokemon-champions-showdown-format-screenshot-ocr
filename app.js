@@ -343,7 +343,7 @@ async function runOcr() {
   if (state.saveKey) setSavedKey(state.geminiKey.trim());
   els.runOcr.disabled = true;
   els.runOcr.textContent = 'Importing...';
-  els.ocrStatus.innerHTML = '<span class="spinner"></span> Sending screenshots to Gemini...';
+  els.ocrStatus.innerHTML = '<span class="spinner"></span> Sending screenshots to AI...';
   try {
     const [movesTeam, statsTeam] = await Promise.all([
       extractTeamFromScreenshot('moves', state.movesDataUrl),

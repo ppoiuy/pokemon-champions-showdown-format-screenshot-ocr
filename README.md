@@ -14,31 +14,34 @@ Updated for Regulation M-B.
    - Screenshot the **Moves & More** tab
    - Screenshot the **Stats** tab
 3. Upload both screenshots.
-4. Enter your Gemini API key.
+4. Enter your AI API key.
 5. Click **Import screenshots**.
 6. Review the results in the Team Editor and fix any OCR mistakes.
 7. Copy the generated Showdown format text from the export panel.
 
-## Gemini API Key
+## API Key
 
-A Gemini API key is required.
+An API key from a supported AI provider is required. Google Gemini has a free tier; OpenAI and Claude are paid.
 
-Get a free API key from Google AI Studio:
-https://aistudio.google.com/app/apikey
+- [Google Gemini](https://aistudio.google.com/app/api-keys) — free tier available
+- [OpenAI](https://platform.openai.com/api-keys) — paid
+- [Claude](https://platform.claude.com/settings/keys) — paid
 
 The app persists your key locally when **Save key** is enabled.
+
+If you run out of free tokens, use a different Google account for a fresh Gemini key.
 
 ## Toggles
 
 - **Auto-format Mega** (default: off) — rewrites species to Mega form and swaps ability when a Mega Stone item is detected
 - **Fuzzy match** (default: on) — corrects close OCR misspellings against the Showdown dataset using Levenshtein distance
-- **AI form lookup** (default: off, unreliable) — asks Gemini to identify the Pokemon sprite and return the correct form name
+- **AI form lookup** (default: off, unreliable) — asks the AI to identify the Pokemon sprite and return the correct form name
 - **Custom form match** (default: on) — applies rule-based form corrections for specific Pokemon
 
 ## Warnings
 
 - OCR can make mistakes. Always review the extracted data before using it.
-- AI form lookup is unreliable — Gemini often misidentifies sprites or returns the wrong form suffix.
+- AI form lookup is unreliable — the AI often misidentifies sprites or returns the wrong form suffix.
 - The tool uses Pokemon Showdown data for validation. Pokemon Champions may have a different legal move/item pool.
 - Stat points are capped at 32 per stat and 66 total based on Pokemon Champions rules.
 
@@ -49,7 +52,7 @@ Basculegion-F, Maushold-Four, Gourgeist-Large, Gourgeist-Small, Gourgeist-Super,
 ## Privacy
 
 - Your API key is stored in your browser's local storage when saved.
-- Screenshots are sent to Google's Gemini API for OCR processing.
+- Screenshots are sent to the selected AI provider for OCR processing.
 - No data is stored on any server.
 
 ## Validation
