@@ -28,9 +28,17 @@ The app persists your key locally when **Save key** is enabled.
 
 ## Toggles
 
-- **Auto-format Mega** — automatically rewrites species to the Mega form and swaps the ability when a Mega stone item is detected
-- **Fuzzy match** — corrects close OCR misspellings against the Showdown dataset using Levenshtein distance
-- **Form lookup** — asks Gemini to identify the Pokemon sprite and return the correct form name (Rotom-Wash, Lycanroc-Midnight, etc.)
+- **Auto-format Mega** (default: off) — rewrites species to Mega form and swaps ability when a Mega Stone item is detected
+- **Fuzzy match** (default: on) — corrects close OCR misspellings against the Showdown dataset using Levenshtein distance
+- **AI form lookup** (default: off, unreliable) — asks Gemini to identify the Pokemon sprite and return the correct form name
+- **Custom form match** (default: on) — applies rule-based form corrections for specific Pokemon (Basculin, Maushold, etc.)
+
+## Warnings
+
+- OCR can make mistakes. Always review the extracted data before using it.
+- AI form lookup is unreliable — Gemini often misidentifies sprites or returns the wrong form suffix.
+- The tool uses Pokemon Showdown data for validation. Pokemon Champions may have a different legal move/item pool.
+- Stat points are capped at 32 per stat and 66 total based on Pokemon Champions rules.
 
 ## Privacy
 
