@@ -63,6 +63,7 @@ function init() {
   renderTeamEditor();
   setExportText(formatExport(state.team));
   setWarnings([]);
+  updateKeyBanner();
   loadShowdownData().then(() => {
     validateAndRender();
   }).catch(err => {
@@ -73,7 +74,7 @@ function init() {
 function bindElements() {
   [
     'geminiKey', 'saveKey', 'autoMega', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
-    'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus'
+    'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus', 'keyBanner'
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
 
@@ -89,6 +90,7 @@ function wireEvents() {
   els.geminiKey.addEventListener('input', () => {
     state.geminiKey = els.geminiKey.value;
     if (state.saveKey) setSavedKey(state.geminiKey.trim());
+    updateKeyBanner();
   });
   for (const input of [els.geminiKey]) {
     input.addEventListener('copy', e => e.preventDefault());
@@ -120,6 +122,11 @@ function wireEvents() {
   els.copyPaste.addEventListener('click', copyExport);
 
   document.addEventListener('paste', handlePaste);
+}
+
+function updateKeyBanner() {
+  const hasKey = state.geminiKey.trim().length > 0;
+  if (els.keyBanner) els.keyBanner.style.display = hasKey ? 'none' : '';
 }
 
 function wireDropzone(kind) {
@@ -184,7 +191,7 @@ async function runOcr() {
   }
   if (!state.geminiKey.trim()) {
     els.ocrStatus.textContent = '';
-    setWarnings([{ kind: 'bad', text: 'A Gemini API key is required. Enter your key at the bottom of the page and try again.' }]);
+    setWarnings([{ kind: 'bad', text: 'A Gemini API key is required. Open the "API Key" section at the bottom of the page and enter your key.' }]);
     return;
   }
   if (state.saveKey) setSavedKey(state.geminiKey.trim());
