@@ -164,12 +164,13 @@ function init() {
   updateKeyBanner();
   restoreCachedScreenshots();
   initChampionsSets();
-  loadShowdownData().then(() => {
+  loadShowdownData().then(async () => {
     validateAndRender();
     if (state.dropdownInputs) {
       buildDatalists();
       renderTeamEditor();
     }
+    if (state.experimentalLearnset) await loadLearnsetData();
   }).catch(err => {
     setWarnings([{ kind: 'bad', text: `Failed to load validation data: ${err.message}` }]);
   });
@@ -976,12 +977,14 @@ async function loadShowdownData() {
 
 async function loadLearnsetData() {
   try {
+    setWarnings([{ kind: 'bad', text: 'Loading moveset data...' }]);
     const text = await (await fetch('https://play.pokemonshowdown.com/data/learnsets.js')).text();
     const exports = {};
     new Function('exports', `${text}; return exports;`)(exports);
     state.data.learnsets = exports.BattleLearnsets || {};
   } catch (e) {
-    console.warn('Failed to load learnset data:', e);
+    setWarnings([{ kind: 'bad', text: `Moveset data failed to load: ${e.message}. Check your internet connection.` }]);
+    return;
   }
   if (state.experimentalLearnset) validateAndRender();
 }
