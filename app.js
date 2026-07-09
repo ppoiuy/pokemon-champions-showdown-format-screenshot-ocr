@@ -1,13 +1,20 @@
 const STORAGE_KEY = 'pcso_gemini_key';
 
+function loadSavedKey() {
+  try { return localStorage.getItem(STORAGE_KEY) || ''; } catch { return ''; }
+}
+function hasSavedKey() {
+  try { return !!localStorage.getItem(STORAGE_KEY); } catch { return false; }
+}
+function setSavedKey(key) {
+  if (key) { try { localStorage.setItem(STORAGE_KEY, key); } catch {} }
+}
+function removeSavedKey() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch {} }
+}
+
 const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 const STAT_NAMES = { hp: 'HP', atk: 'Atk', def: 'Def', spa: 'SpA', spd: 'SpD', spe: 'Spe' };
-const STAT_LABEL_ALIASES = {
-  hp: 'hp', attack: 'atk', atk: 'atk', defense: 'def', def: 'def',
-  'sp. atk': 'spa', 'spa.': 'spa', spatk: 'spa', 'special attack': 'spa',
-  'sp. def': 'spd', spd: 'spd', 'special defense': 'spd', speed: 'spe'
-};
-
 const NATURE_STAT_ALIASES = {
   hp: 'hp', atk: 'atk', attack: 'atk', def: 'def', defense: 'def',
   spa: 'spa', spatk: 'spa', specialattack: 'spa', 'spatk': 'spa',
@@ -22,19 +29,6 @@ const NATURE_MAP = new Map([
   ['spe:atk', 'Timid'], ['spe:def', 'Hasty'], ['spe:spa', 'Jolly'], ['spe:spd', 'Naive']
 ]);
 
-const SCREEN_CROPS = {
-  moves: [
-    { x: 0.08, y: 0.18, w: 0.41, h: 0.17 }, { x: 0.54, y: 0.18, w: 0.38, h: 0.17 },
-    { x: 0.08, y: 0.41, w: 0.41, h: 0.17 }, { x: 0.54, y: 0.41, w: 0.38, h: 0.17 },
-    { x: 0.08, y: 0.64, w: 0.41, h: 0.17 }, { x: 0.54, y: 0.64, w: 0.38, h: 0.17 },
-  ],
-  stats: [
-    { x: 0.08, y: 0.18, w: 0.41, h: 0.17 }, { x: 0.54, y: 0.18, w: 0.38, h: 0.17 },
-    { x: 0.08, y: 0.41, w: 0.41, h: 0.17 }, { x: 0.54, y: 0.41, w: 0.38, h: 0.17 },
-    { x: 0.08, y: 0.64, w: 0.41, h: 0.17 }, { x: 0.54, y: 0.64, w: 0.38, h: 0.17 },
-  ]
-};
-
 const DEFAULT_TEAM = Array.from({ length: 6 }, (_, i) => ({
   slot: i + 1,
   species: '',
@@ -48,9 +42,8 @@ const DEFAULT_TEAM = Array.from({ length: 6 }, (_, i) => ({
 }));
 
 const state = {
-  geminiKey: localStorage.getItem(STORAGE_KEY) || '',
-  saveKey: !!localStorage.getItem(STORAGE_KEY),
-  useGemini: !!localStorage.getItem(STORAGE_KEY),
+  geminiKey: loadSavedKey(),
+  saveKey: hasSavedKey(),
   autoMega: true,
   movesFile: null,
   statsFile: null,
@@ -58,7 +51,6 @@ const state = {
   statsDataUrl: '',
   team: structuredClone(DEFAULT_TEAM),
   data: null,
-  pasteIndex: 0,
 };
 
 const els = {};
@@ -92,15 +84,11 @@ function wireEvents() {
 
   els.saveKey.addEventListener('change', () => {
     state.saveKey = els.saveKey.checked;
-    if (!state.saveKey) {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    if (!state.saveKey) removeSavedKey();
   });
   els.geminiKey.addEventListener('input', () => {
     state.geminiKey = els.geminiKey.value;
-    if (state.saveKey) {
-      localStorage.setItem(STORAGE_KEY, state.geminiKey.trim());
-    }
+    if (state.saveKey) setSavedKey(state.geminiKey.trim());
   });
   for (const input of [els.geminiKey]) {
     input.addEventListener('copy', e => e.preventDefault());
@@ -114,8 +102,7 @@ function wireEvents() {
 
   document.querySelectorAll('[data-pick]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const target = btn.dataset.pick;
-      els[`${target}File`].click();
+      els[`${btn.dataset.pick}File`].click();
     });
   });
   document.querySelectorAll('[data-clear-upload]').forEach(btn => {
@@ -148,7 +135,7 @@ function wireDropzone(kind) {
 }
 
 function handlePaste(e) {
-  const files = [...(e.clipboardData?.files || [])].filter(file => file.type.startsWith('image/'));
+  const files = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith('image/'));
   const items = [...(e.clipboardData?.items || [])]
     .filter(item => item.type.startsWith('image/'))
     .map(item => item.getAsFile())
@@ -176,7 +163,6 @@ function resetAll() {
   clearUpload('moves');
   clearUpload('stats');
   state.team = structuredClone(DEFAULT_TEAM);
-  state.pasteIndex = 0;
   renderTeamEditor();
   validateAndRender();
 }
@@ -197,12 +183,10 @@ async function runOcr() {
     return;
   }
   if (!state.geminiKey.trim()) {
-    const proceed = confirm('No Gemini API key is saved. Continue with Tesseract OCR, or cancel and enter a Gemini key for better results?');
-    if (!proceed) return;
+    alert('A Gemini API key is required. Enter your key in the Gemini OCR panel above.');
+    return;
   }
-  if (state.saveKey && state.geminiKey.trim()) {
-    localStorage.setItem(STORAGE_KEY, state.geminiKey.trim());
-  }
+  if (state.saveKey) setSavedKey(state.geminiKey.trim());
   els.runOcr.disabled = true;
   els.runOcr.textContent = 'Working...';
   try {
@@ -214,7 +198,7 @@ async function runOcr() {
     renderTeamEditor();
     validateAndRender();
   } catch (err) {
-    setWarnings([{ kind: 'bad', text: err.message || 'OCR failed' }]);
+    setWarnings([{ kind: 'bad', text: err.message || 'OCR failed.' }]);
   } finally {
     els.runOcr.disabled = false;
     els.runOcr.textContent = 'Import screenshots';
@@ -283,11 +267,9 @@ function onTeamEdit(e) {
   const mon = state.team[idx];
   if (!mon) return;
   if (field.startsWith('stat.')) {
-    const key = field.split('.')[1];
-    mon.statPoints[key] = clampInt(value, 0, 32);
+    mon.statPoints[field.split('.')[1]] = clampInt(value, 0, 32);
   } else if (field.startsWith('move.')) {
-    const j = Number(field.split('.')[1]);
-    mon.moves[j] = value;
+    mon.moves[Number(field.split('.')[1])] = value;
   } else if (field === 'level') {
     mon.level = clampInt(value, 1, 100);
   } else {
@@ -338,7 +320,6 @@ async function copyExport() {
       return;
     }
   } catch {}
-
   els.exportText.focus();
   els.exportText.select();
   document.execCommand('copy');
@@ -407,7 +388,6 @@ function lookupMega(species, item, data = state.data) {
 
 function validateTeam(team, data, autoMega) {
   const warnings = [];
-
   team.forEach((mon, idx) => {
     const perMonWarnings = [];
     const statTotal = STAT_KEYS.reduce((sum, key) => sum + clampInt(mon.statPoints?.[key] ?? 0, 0, 999), 0);
@@ -433,10 +413,8 @@ function validateTeam(team, data, autoMega) {
       const n = normalizeLookup(mon.nature.replace(/\s+nature$/i, ''));
       if (!data.naturesByName.has(n)) perMonWarnings.push({ slot: `Slot ${idx + 1}`, kind: 'bad', text: `unknown nature "${mon.nature}".` });
     }
-
     warnings.push(...perMonWarnings);
   });
-
   return { team, warnings };
 }
 
@@ -449,40 +427,34 @@ function getMegaSpeciesFromItem(data, speciesEntry, item) {
 }
 
 async function extractTeamFromScreenshot(kind, dataUrl) {
-  const image = await loadImage(dataUrl);
-  const crops = SCREEN_CROPS[kind].map((rect, i) => cropImage(image, rect, i));
-  const results = [];
-  for (let i = 0; i < crops.length; i++) {
-    const crop = crops[i];
-    results.push(await extractCard(kind, crop, i + 1));
-  }
-  return results;
-}
-
-async function extractCard(kind, dataUrl, slot) {
-  if (state.geminiKey.trim()) {
-    try {
-      return await geminiExtractCard(kind, dataUrl, slot);
-    } catch (err) {
-      console.warn('Gemini card OCR failed, falling back to Tesseract', err);
-    }
-  }
-  return await tesseractExtractCard(kind, dataUrl, slot);
-}
-
-async function geminiExtractCard(kind, dataUrl, slot) {
   const mimeType = dataUrl.match(/^data:(.*?);base64,/i)?.[1] || 'image/png';
   const base64 = dataUrl.split(',')[1];
   const prompt = kind === 'stats'
-    ? `Read this Pokemon Champions STATS card for slot ${slot}. Return JSON with fields: species, item, ability, level, statPoints (hp/atk/def/spa/spd/spe), natureUp, natureDown. Use the exact Pokemon names and item/ability names as shown. The stat points are the numbers shown on the right of each stat line. If a nature arrow is visible, identify which stat is boosted and lowered.`
-    : `Read this Pokemon Champions MOVES & MORE card for slot ${slot}. Return JSON with fields: species, moves (an array of exactly 4 move names in order). Use the exact move names as shown.`;
+    ? `You are analyzing a Pokemon Champions "Stats" screen. It shows 6 Pokemon cards arranged in a grid (2 columns, 3 rows). Read left-to-right, top-to-bottom. Return a JSON object with a "team" array of exactly 6 objects. Each object MUST have the following fields. Do not skip any field. If a value is not visible use null.
+
+- species (string): the Pokemon species name
+- item (string): the held item name
+- ability (string): the ability name
+- level (number): the numeric level
+- statPoints (object): { hp, atk, def, spa, spd, spe } — the numeric stat point values
+- natureUp (string|null): the stat boosted by nature (look for a red up arrow next to a stat)
+- natureDown (string|null): the stat lowered by nature (look for a blue down arrow next to a stat)
+
+Use exact English names as shown.`
+    : `You are analyzing a Pokemon Champions "Moves & More" screen. It shows 6 Pokemon cards arranged in a grid (2 columns, 3 rows). Read left-to-right, top-to-bottom. Return a JSON object with a "team" array of exactly 6 objects. Each object MUST have the following fields. Do not skip any field.
+
+- species (string): the Pokemon species name
+- item (string): the held item name — shown on the card
+- ability (string): the ability name — shown on the card
+- moves (array of 4 strings): exactly 4 move names in order
+
+Use exact English names as shown.`;
+
   const body = {
     contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64 } }, { text: prompt }] }],
     generationConfig: {
       temperature: 0.1,
-      topK: 1,
-      topP: 0.8,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
       responseMimeType: 'application/json'
     }
   };
@@ -491,105 +463,57 @@ async function geminiExtractCard(kind, dataUrl, slot) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error(`Gemini OCR failed (${res.status})`);
+  if (!res.ok) {
+    let detail = '';
+    try { const err = await res.json(); detail = err.error?.message || ''; } catch {}
+    throw new Error(`Gemini request failed (${res.status}${detail ? ': ' + detail : ''})`);
+  }
   const json = await res.json();
   const text = json.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+  if (!text) throw new Error('Gemini returned an empty response.');
   const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
   const start = cleaned.indexOf('{');
   const end = cleaned.lastIndexOf('}');
   const parsed = JSON.parse(start >= 0 && end >= start ? cleaned.slice(start, end + 1) : cleaned);
-  return kind === 'stats' ? normalizeStatsOcr(parsed, slot) : normalizeMovesOcr(parsed, slot);
+  const team = parsed.team || [];
+  if (!Array.isArray(team) || team.length === 0) throw new Error(`Gemini returned no team data for ${kind} screen.`);
+  return kind === 'stats' ? normalizeStatsTeam(team) : normalizeMovesTeam(team);
 }
 
-async function tesseractExtractCard(kind, dataUrl, slot) {
-  const result = await Tesseract.recognize(dataUrl, 'eng', { logger: () => {} });
-  const text = result.data.text || '';
-  return kind === 'stats' ? parseStatsText(text, slot) : parseMovesText(text, slot);
+function normalizeStatsTeam(team) {
+  return team.slice(0, 6).map((entry, i) => {
+    const sp = entry.statPoints || {};
+    return {
+      slot: i + 1,
+      species: entry.species || '',
+      item: entry.item || '',
+      ability: entry.ability || '',
+      level: clampInt(entry.level ?? 50, 1, 100),
+      statPoints: {
+        hp: clampInt(sp.hp ?? 0, 0, 32),
+        atk: clampInt(sp.atk ?? 0, 0, 32),
+        def: clampInt(sp.def ?? 0, 0, 32),
+        spa: clampInt(sp.spa ?? 0, 0, 32),
+        spd: clampInt(sp.spd ?? 0, 0, 32),
+        spe: clampInt(sp.spe ?? 0, 0, 32),
+      },
+      nature: natureFromBoostDrop(entry.natureUp, entry.natureDown),
+      moves: ['', '', '', '']
+    };
+  });
 }
 
-function normalizeStatsOcr(parsed, slot) {
-  const statPoints = parsed.statPoints || {};
-  const nature = natureFromBoostDrop(parsed.natureUp, parsed.natureDown);
-  return {
-    slot,
-    species: parsed.species || '',
-    item: parsed.item || '',
-    ability: parsed.ability || '',
-    level: clampInt(parsed.level ?? 50, 1, 100),
-    statPoints: {
-      hp: clampInt(statPoints.hp ?? 0, 0, 32),
-      atk: clampInt(statPoints.atk ?? 0, 0, 32),
-      def: clampInt(statPoints.def ?? 0, 0, 32),
-      spa: clampInt(statPoints.spa ?? 0, 0, 32),
-      spd: clampInt(statPoints.spd ?? 0, 0, 32),
-      spe: clampInt(statPoints.spe ?? 0, 0, 32),
-    },
-    nature,
-    moves: ['', '', '', '']
-  };
-}
-
-function normalizeMovesOcr(parsed, slot) {
-  return {
-    slot,
-    species: parsed.species || '',
-    moves: (parsed.moves || []).slice(0, 4).map(v => String(v || '').trim()).concat(['', '', '', '']).slice(0, 4),
-    item: '', ability: '', level: 50, statPoints: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }, nature: ''
-  };
-}
-
-function parseStatsText(text, slot) {
-  const lines = cleanLines(text);
-  const species = lines[0] || '';
-  const item = findLikelyItem(lines);
-  const ability = findLikelyAbility(lines);
-  const level = findLevel(lines) || 50;
-  const statPoints = parseStatPoints(lines);
-  const nature = ''; // fallback text OCR usually won't catch arrows reliably
-  return { slot, species, item, ability, level, statPoints, nature, moves: ['', '', '', ''] };
-}
-
-function parseMovesText(text, slot) {
-  const lines = cleanLines(text);
-  const species = lines[0] || '';
-  const moves = lines.filter(line => line.length > 1).slice(1, 5);
-  return { slot, species, moves: moves.slice(0, 4).concat(['', '', '', '']).slice(0, 4), item: '', ability: '', level: 50, statPoints: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }, nature: '' };
-}
-
-function cleanLines(text) {
-  return String(text || '')
-    .split(/\r?\n/)
-    .map(s => s.trim())
-    .filter(Boolean);
-}
-
-function findLikelyItem(lines) {
-  return lines.find(line => /berry|orb|herb|sash|band|vest|needle|specs|scarf|lenses|policy|incense|leftovers|life orb|charcoal|mawilite/i.test(line)) || '';
-}
-
-function findLikelyAbility(lines) {
-  return lines.find(line => /^[A-Za-z][A-Za-z '\-.]+$/.test(line) && !/slot|level|hp|atk|def|spa|spd|spe/i.test(line) && line.length > 2) || '';
-}
-
-function findLevel(lines) {
-  const line = lines.find(v => /level\s*\d+|\b\d{1,3}\b/.test(v));
-  if (!line) return 0;
-  const m = line.match(/(\d{1,3})/);
-  return m ? clampInt(m[1], 1, 100) : 0;
-}
-
-function parseStatPoints(lines) {
-  const stats = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-  for (const line of lines) {
-    const lower = line.toLowerCase();
-    for (const [k, label] of Object.entries(STAT_LABEL_ALIASES)) {
-      if (lower.includes(k)) {
-        const nums = line.match(/(\d+)/g);
-        if (nums?.length) stats[label] = clampInt(nums[nums.length - 1], 0, 32);
-      }
-    }
-  }
-  return stats;
+function normalizeMovesTeam(team) {
+  return team.slice(0, 6).map((entry, i) => ({
+    slot: i + 1,
+    species: entry.species || '',
+    moves: (entry.moves || []).slice(0, 4).map(v => String(v || '').trim()).concat(['', '', '', '']).slice(0, 4),
+    item: entry.item || '',
+    ability: entry.ability || '',
+    level: 50,
+    statPoints: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+    nature: ''
+  }));
 }
 
 function natureFromBoostDrop(up, down) {
@@ -620,7 +544,6 @@ async function loadShowdownData() {
 async function fetchShowdownModule(url) {
   const text = await (await fetch(url)).text();
   const exports = {};
-  // eslint-disable-next-line no-new-func
   new Function('exports', `${text}; return exports;`)(exports);
   return exports;
 }
@@ -692,29 +615,6 @@ async function fileToDataUrl(file) {
     reader.onerror = () => reject(reader.error || new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
-}
-
-async function loadImage(dataUrl) {
-  return await new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = dataUrl;
-  });
-}
-
-function cropImage(image, rect, index) {
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(image.width * rect.w));
-  canvas.height = Math.max(1, Math.round(image.height * rect.h));
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(
-    image,
-    Math.round(image.width * rect.x), Math.round(image.height * rect.y),
-    Math.round(image.width * rect.w), Math.round(image.height * rect.h),
-    0, 0, canvas.width, canvas.height
-  );
-  return canvas.toDataURL('image/png');
 }
 
 function escapeHtml(value) {

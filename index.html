@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pokemon Champions Showdown OCR</title>
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
   <script type="module" src="./app.js"></script>
 </head>
 <body>
@@ -17,7 +16,7 @@
         <p class="subtitle">Upload the Moves & More and Stats screenshots, then copy a single Showdown paste.</p>
       </div>
       <label class="mega-toggle">
-        <input id="autoMega" type="checkbox" checked />
+        <input id="autoMega" type="checkbox" />
         <span>Auto-format Mega</span>
       </label>
     </header>
@@ -42,7 +41,7 @@
           <span>Save key</span>
         </label>
       </div>
-      <p class="warning-inline">Gemini OCR is recommended. If no key is saved, the app falls back to Tesseract OCR.</p>
+      <p class="warning-inline">A Gemini API key is required to use this tool.</p>
       <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get a free API key from Google AI Studio</a>
     </section>
 
