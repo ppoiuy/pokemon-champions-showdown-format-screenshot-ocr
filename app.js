@@ -134,6 +134,7 @@ const state = {
   fuzzyMatch: true,
   formLookup: false,
   customFormMatch: true,
+  dropdownInputs: false,
   movesFile: null,
   statsFile: null,
   movesDataUrl: '',
@@ -156,6 +157,7 @@ function init() {
   restoreCachedScreenshots();
   loadShowdownData().then(() => {
     validateAndRender();
+    if (state.dropdownInputs) buildDatalists();
   }).catch(err => {
     setWarnings([{ kind: 'bad', text: `Failed to load validation data: ${err.message}` }]);
   });
@@ -163,8 +165,8 @@ function init() {
 
 function bindElements() {
   [
-    'geminiKey', 'saveKey', 'aiProvider', 'autoMega', 'fuzzyMatch', 'formLookup', 'customFormMatch', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
-    'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus', 'keyBanner'
+    'geminiKey', 'saveKey', 'aiProvider', 'autoMega', 'fuzzyMatch', 'formLookup', 'customFormMatch', 'dropdownInputs', 'movesFile', 'statsFile', 'movesPreview', 'statsPreview',
+    'movesStatus', 'statsStatus', 'teamEditor', 'exportText', 'warningList', 'runOcr', 'clearAll', 'copyPaste', 'keyPanel', 'ocrStatus', 'keyBanner', 'datalistContainer'
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
 
@@ -176,6 +178,7 @@ function wireEvents() {
   els.fuzzyMatch.checked = state.fuzzyMatch;
   els.formLookup.checked = state.formLookup;
   els.customFormMatch.checked = state.customFormMatch;
+  els.dropdownInputs.checked = state.dropdownInputs;
 
   els.saveKey.addEventListener('change', () => {
     state.saveKey = els.saveKey.checked;
@@ -207,6 +210,11 @@ function wireEvents() {
   });
   els.customFormMatch.addEventListener('change', () => {
     state.customFormMatch = els.customFormMatch.checked;
+  });
+  els.dropdownInputs.addEventListener('change', () => {
+    state.dropdownInputs = els.dropdownInputs.checked;
+    if (state.dropdownInputs && state.data) buildDatalists();
+    renderTeamEditor();
   });
 
   document.querySelectorAll('[data-pick]').forEach(btn => {
@@ -333,6 +341,7 @@ async function runOcr() {
     renderTeamEditor();
     validateAndRender();
     els.ocrStatus.textContent = 'Done. Review and copy the paste below.';
+    if (state.dropdownInputs && state.data) buildDatalists();
   } catch (err) {
     els.ocrStatus.textContent = '';
     setWarnings([{ kind: 'bad', text: err.message || 'OCR failed.' }]);
@@ -360,8 +369,24 @@ function mergeTeams(movesTeam, statsTeam) {
   state.team = merged;
 }
 
+function buildDatalists() {
+  if (!state.data || !els.datalistContainer) return;
+  const data = state.data;
+  const lists = {
+    'dl-species': [...data.speciesByName.values()].map(e => e.name).sort(),
+    'dl-items': [...data.itemsByName.values()].map(e => e.name).sort(),
+    'dl-abilities': [...data.abilitiesByName.values()].map(e => e.name).sort(),
+    'dl-natures': [...data.naturesByName.values()].map(e => e).sort(),
+    'dl-moves': [...data.movesByName.values()].map(e => e.name).sort(),
+  };
+  els.datalistContainer.innerHTML = Object.entries(lists).map(([id, names]) =>
+    `<datalist id="${id}">${names.map(n => `<option value="${escapeHtml(n)}">`).join('')}</datalist>`
+  ).join('');
+}
+
 function renderTeamEditor() {
   els.teamEditor.innerHTML = '';
+  const dl = state.dropdownInputs ? ' list="dl-' : '';
   state.team.forEach((mon, i) => {
     const card = document.createElement('article');
     card.className = 'team-card';
@@ -371,9 +396,9 @@ function renderTeamEditor() {
         <span class="hint">Imported Pokemon</span>
       </div>
       <div class="team-grid">
-        <label class="team-block"><span class="team-label">Species</span><input class="team-input" data-field="species" data-index="${i}" value="${escapeHtml(mon.species || '')}"></label>
-        <label class="team-block"><span class="team-label">Item</span><input class="team-input" data-field="item" data-index="${i}" value="${escapeHtml(mon.item || '')}"></label>
-        <label class="team-block"><span class="team-label">Ability</span><input class="team-input" data-field="ability" data-index="${i}" value="${escapeHtml(mon.ability || '')}"></label>
+        <label class="team-block"><span class="team-label">Species</span><input class="team-input" data-field="species" data-index="${i}" value="${escapeHtml(mon.species || '')}"${dl}species"></label>
+        <label class="team-block"><span class="team-label">Item</span><input class="team-input" data-field="item" data-index="${i}" value="${escapeHtml(mon.item || '')}"${dl}items"></label>
+        <label class="team-block"><span class="team-label">Ability</span><input class="team-input" data-field="ability" data-index="${i}" value="${escapeHtml(mon.ability || '')}"${dl}abilities"></label>
         <label class="team-block"><span class="team-label">Level</span><input class="team-input" data-field="level" data-index="${i}" value="${escapeHtml(String(mon.level ?? 50))}"></label>
       </div>
       <div style="height:10px"></div>
@@ -384,10 +409,10 @@ function renderTeamEditor() {
       </div>
       <div style="height:10px"></div>
       <div class="team-grid">
-        <label class="team-block"><span class="team-label">Nature</span><input class="team-input" data-field="nature" data-index="${i}" value="${escapeHtml(mon.nature || '')}"></label>
+        <label class="team-block"><span class="team-label">Nature</span><input class="team-input" data-field="nature" data-index="${i}" value="${escapeHtml(mon.nature || '')}"${dl}natures"></label>
         <div class="team-block" style="grid-column:span 3"><span class="team-label">Moves</span>
           <div class="moves-grid">
-            ${mon.moves.map((move, j) => `<input class="team-input" data-field="move.${j}" data-index="${i}" value="${escapeHtml(move || '')}" placeholder="Move ${j + 1}">`).join('')}
+            ${mon.moves.map((move, j) => `<input class="team-input" data-field="move.${j}" data-index="${i}" value="${escapeHtml(move || '')}" placeholder="Move ${j + 1}"${dl}moves">`).join('')}
           </div>
         </div>
       </div>

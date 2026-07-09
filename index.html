@@ -33,6 +33,10 @@
           <input id="customFormMatch" type="checkbox" checked />
           <span>Custom form match</span>
         </label>
+        <label class="toggle" title="Use dropdown autocomplete in the team editor for species, items, abilities, and moves (default: off)">
+          <input id="dropdownInputs" type="checkbox" />
+          <span>Dropdown inputs</span>
+        </label>
       </div>
     </header>
 
@@ -97,6 +101,7 @@
             <span class="hint">Manual edits are allowed after OCR</span>
           </div>
           <div id="teamEditor" class="team-editor"></div>
+      <div id="datalistContainer" style="display:none"></div>
         </section>
       </div>
 
@@ -134,9 +139,9 @@
       <p class="warning-inline">A valid API key is required.</p>
       <div class="api-links">
         <span class="api-links-label">Get an API key:</span>
-        <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google Gemini</a>
+        <a class="api-link" href="https://aistudio.google.com/app/api-keys" target="_blank" rel="noopener noreferrer">Google Gemini</a>
         <a class="api-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI</a>
-        <a class="api-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Claude</a>
+        <a class="api-link" href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener noreferrer">Claude</a>
       </div>
       <p class="key-hint">Gemini has a free API tier. OpenAI and Claude are paid only.</p>
       <p class="key-hint">If you run out of tokens, use a different Google account and generate a fresh Gemini API key for more free credits.</p>
