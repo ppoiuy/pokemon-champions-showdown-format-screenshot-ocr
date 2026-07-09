@@ -40,6 +40,13 @@ button, input, textarea { font: inherit; }
 h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; }
 .subtitle, .hint, .upload-status, .warning-inline { color: var(--muted); margin: 8px 0 0; }
 
+.regulation {
+  color: var(--accent-2);
+  font-size: 13px;
+  margin: 6px 0 0;
+  opacity: .8;
+}
+
 .api-link {
   display: inline-flex;
   margin-top: 10px;
