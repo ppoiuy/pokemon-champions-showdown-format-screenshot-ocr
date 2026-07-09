@@ -385,7 +385,7 @@ function renderTeamEditor() {
       <div style="height:10px"></div>
       <div class="team-grid">
         <label class="team-block"><span class="team-label">Nature</span><input class="team-input" data-field="nature" data-index="${i}" value="${escapeHtml(mon.nature || '')}"></label>
-        <div class="team-block"><span class="team-label">Moves</span>
+        <div class="team-block" style="grid-column:span 3"><span class="team-label">Moves</span>
           <div class="moves-grid">
             ${mon.moves.map((move, j) => `<input class="team-input" data-field="move.${j}" data-index="${i}" value="${escapeHtml(move || '')}" placeholder="Move ${j + 1}">`).join('')}
           </div>

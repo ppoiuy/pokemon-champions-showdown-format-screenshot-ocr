@@ -257,6 +257,11 @@ h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; }
   gap: 8px;
 }
 
+.moves-grid .team-input {
+  padding: 12px;
+  font-size: 14px;
+}
+
 .warnings {
   display: grid;
   gap: 8px;
