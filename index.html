@@ -16,17 +16,21 @@
         <p class="subtitle">Pokemon Champions screenshots to Showdown format text.</p>
       </div>
       <div class="header-toggles">
-        <label class="toggle" title="Automatically rename species to Mega form and swap ability when a Mega Stone item is held">
+        <label class="toggle" title="Automatically rename species to Mega form and swap ability when a Mega Stone item is held (default: off)">
           <input id="autoMega" type="checkbox" />
           <span>Auto-format Mega</span>
         </label>
-        <label class="toggle" title="Auto-correct close OCR misspellings against the Pokemon Showdown database">
+        <label class="toggle" title="Auto-correct close OCR misspellings against the Pokemon Showdown database (default: on)">
           <input id="fuzzyMatch" type="checkbox" checked />
           <span>Fuzzy match</span>
         </label>
-        <label class="toggle" title="Ask Gemini to identify the Pokemon sprite and return the correct form name">
-          <input id="formLookup" type="checkbox" checked />
-          <span>Form lookup</span>
+        <label class="toggle" title="Ask Gemini to identify the Pokemon sprite and return the correct form name (default: off)">
+          <input id="formLookup" type="checkbox" />
+          <span>AI form lookup</span>
+        </label>
+        <label class="toggle" title="Apply rule-based form corrections for specific Pokemon based on known patterns (default: on)">
+          <input id="customFormMatch" type="checkbox" checked />
+          <span>Custom form match</span>
         </label>
       </div>
     </header>
