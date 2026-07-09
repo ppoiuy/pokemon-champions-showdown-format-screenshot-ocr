@@ -10,7 +10,7 @@ function setSavedKey(key) {
   if (key) { try { localStorage.setItem(STORAGE_KEY, key); } catch {} }
 }
 function removeSavedKey() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch {} }
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
 }
 
 const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
