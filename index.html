@@ -22,6 +22,11 @@
       </label>
     </header>
 
+    <details class="panel">
+      <summary class="panel-head" style="cursor:pointer"><h2>How to get your screenshots</h2></summary>
+      <p style="margin:0">From the Pokemon Champions home page: <strong>Train</strong> → <strong>Replica Teams</strong> → <strong>Share Your Battle Teams</strong> → choose a team → <strong>View Details</strong>. Screenshot the <strong>Moves &amp; More</strong> tab and the <strong>Stats</strong> tab for each Pokemon.</p>
+    </details>
+
     <section class="panel key-panel" id="keyPanel">
       <div class="panel-head">
         <h2>Gemini OCR</h2>
@@ -60,10 +65,10 @@
               </div>
               <input id="movesFile" type="file" accept="image/*" hidden />
               <button type="button" class="dropzone" data-pick="moves">
+                <img id="movesPreview" class="preview" alt="Moves preview" />
                 <span>Click, drag &amp; drop, or paste first</span>
                 <small>Ctrl+V fills this slot first</small>
               </button>
-              <img id="movesPreview" class="preview" alt="Moves preview" />
               <p class="upload-status" id="movesStatus">Waiting for image</p>
             </article>
 
@@ -74,10 +79,10 @@
               </div>
               <input id="statsFile" type="file" accept="image/*" hidden />
               <button type="button" class="dropzone" data-pick="stats">
+                <img id="statsPreview" class="preview" alt="Stats preview" />
                 <span>Click, drag &amp; drop, or paste second</span>
                 <small>Ctrl+V fills this slot second</small>
               </button>
-              <img id="statsPreview" class="preview" alt="Stats preview" />
               <p class="upload-status" id="statsStatus">Waiting for image</p>
             </article>
           </div>

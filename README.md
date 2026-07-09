@@ -9,12 +9,17 @@ This tool is intended for quickly sharing or saving teams from Pokemon Champions
 ## Usage
 
 1. Open the site.
-2. Add the `Moves & More` screenshot.
-3. Add the `Stats` screenshot.
-4. Enter a Gemini API key for best OCR results, or continue with the built-in Tesseract fallback.
-5. Click `Import screenshots`.
-6. Review and manually fix any extracted fields if needed.
-7. Copy the generated Pokemon Showdown paste from the export panel.
+2. Take screenshots of each Pokemon in your team:
+   - From the Pokemon Champions home page: **Train** → **Replica Teams** → **Share Your Battle Teams** → choose a team → **View Details**
+   - Screenshot the **Moves & More** tab.
+   - Screenshot the **Stats** tab.
+   - Repeat for each team member.
+3. Add the `Moves & More` screenshot.
+4. Add the `Stats` screenshot.
+5. Enter a Gemini API key for best OCR results, or continue with the built-in Tesseract fallback.
+6. Click `Import screenshots`.
+7. Review and manually fix any extracted fields if needed.
+8. Copy the generated Pokemon Showdown paste from the export panel.
 
 ## Gemini API Key
 
