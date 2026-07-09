@@ -13,6 +13,19 @@ function removeSavedKey() {
   try { localStorage.removeItem(STORAGE_KEY); } catch {}
 }
 
+const MOVES_STORAGE_KEY = 'pcso_moves_data';
+const STATS_STORAGE_KEY = 'pcso_stats_data';
+
+function loadScreenshotData(kind) {
+  try { return localStorage.getItem(kind === 'moves' ? MOVES_STORAGE_KEY : STATS_STORAGE_KEY) || ''; } catch { return ''; }
+}
+function saveScreenshotData(kind, dataUrl) {
+  try { localStorage.setItem(kind === 'moves' ? MOVES_STORAGE_KEY : STATS_STORAGE_KEY, dataUrl); } catch {}
+}
+function clearScreenshotData(kind) {
+  try { localStorage.removeItem(kind === 'moves' ? MOVES_STORAGE_KEY : STATS_STORAGE_KEY); } catch {}
+}
+
 const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 const STAT_NAMES = { hp: 'HP', atk: 'Atk', def: 'Def', spa: 'SpA', spd: 'SpD', spe: 'Spe' };
 const NATURE_STAT_ALIASES = {
@@ -65,6 +78,7 @@ function init() {
   setExportText(formatExport(state.team));
   setWarnings([]);
   updateKeyBanner();
+  restoreCachedScreenshots();
   loadShowdownData().then(() => {
     validateAndRender();
   }).catch(err => {
@@ -134,6 +148,18 @@ function updateKeyBanner() {
   if (els.keyBanner) els.keyBanner.style.display = hasKey ? 'none' : '';
 }
 
+function restoreCachedScreenshots() {
+  for (const kind of ['moves', 'stats']) {
+    const cached = loadScreenshotData(kind);
+    if (cached) {
+      state[`${kind}DataUrl`] = cached;
+      els[`${kind}Preview`].src = cached;
+      els[`${kind}Preview`].style.display = 'block';
+      els[`${kind}Status`].textContent = 'Restored from previous session';
+    }
+  }
+}
+
 function wireDropzone(kind) {
   const card = document.querySelector(`[data-upload="${kind}"]`);
   card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag'); });
@@ -166,6 +192,7 @@ function clearUpload(kind) {
   els[`${kind}Preview`].src = '';
   els[`${kind}Preview`].style.display = 'none';
   els[`${kind}Status`].textContent = 'Waiting for image';
+  clearScreenshotData(kind);
   if (kind === 'moves') state.team = structuredClone(DEFAULT_TEAM);
   if (kind === 'stats') state.team = structuredClone(DEFAULT_TEAM);
   validateAndRender();
@@ -177,6 +204,8 @@ function resetAll() {
   state.team = structuredClone(DEFAULT_TEAM);
   renderTeamEditor();
   validateAndRender();
+  clearScreenshotData('moves');
+  clearScreenshotData('stats');
 }
 
 async function handleFilePick(kind, file) {
@@ -187,6 +216,7 @@ async function handleFilePick(kind, file) {
   els[`${kind}Preview`].src = dataUrl;
   els[`${kind}Preview`].style.display = 'block';
   els[`${kind}Status`].textContent = file.name;
+  saveScreenshotData(kind, dataUrl);
 }
 
 async function runOcr() {
