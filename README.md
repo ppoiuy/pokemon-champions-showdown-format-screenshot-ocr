@@ -33,7 +33,7 @@ The app persists your key locally when **Save key** is enabled.
 - **Auto-format Mega** (default: off) — rewrites species to Mega form and swaps ability when a Mega Stone item is detected
 - **Fuzzy match** (default: on) — corrects close OCR misspellings against the Showdown dataset using Levenshtein distance
 - **AI form lookup** (default: off, unreliable) — asks Gemini to identify the Pokemon sprite and return the correct form name
-- **Custom form match** (default: on) — applies rule-based form corrections for specific Pokemon (Basculin, Maushold, etc.)
+- **Custom form match** (default: on) — applies rule-based form corrections for specific Pokemon
 
 ## Warnings
 
