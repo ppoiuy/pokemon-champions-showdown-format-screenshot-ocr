@@ -447,7 +447,7 @@ function onTeamEdit(e) {
   const mon = state.team[idx];
   if (!mon) return;
   if (field.startsWith('stat.')) {
-    mon.statPoints[field.split('.')[1]] = clampInt(value, 0, 32);
+    mon.statPoints[field.split('.')[1]] = clampInt(value, 0, 99);
   } else if (field.startsWith('move.')) {
     mon.moves[Number(field.split('.')[1])] = value;
   } else if (field === 'level') {
@@ -738,12 +738,12 @@ function normalizeStatsTeam(team) {
       ability: entry.ability || '',
       level: clampInt(entry.level ?? 50, 1, 100),
       statPoints: {
-        hp: clampInt(sp.hp ?? 0, 0, 99),
-        atk: clampInt(sp.atk ?? 0, 0, 99),
-        def: clampInt(sp.def ?? 0, 0, 99),
-        spa: clampInt(sp.spa ?? 0, 0, 99),
-        spd: clampInt(sp.spd ?? 0, 0, 99),
-        spe: clampInt(sp.spe ?? 0, 0, 99),
+        hp: clampInt(sp.hp ?? 0, 0, 32),
+        atk: clampInt(sp.atk ?? 0, 0, 32),
+        def: clampInt(sp.def ?? 0, 0, 32),
+        spa: clampInt(sp.spa ?? 0, 0, 32),
+        spd: clampInt(sp.spd ?? 0, 0, 32),
+        spe: clampInt(sp.spe ?? 0, 0, 32),
       },
       nature: entry.nature || natureFromBoostDrop(entry.natureUp, entry.natureDown),
       moves: ['', '', '', '']
