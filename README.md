@@ -4,47 +4,40 @@ Convert Pokemon Champions team detail screenshots into Pokemon Showdown import t
 
 Live site: https://ppoiuy.github.io/pokemon-champions-showdown-format-screenshot-ocr/
 
-This tool is intended for quickly sharing or saving teams from Pokemon Champions, especially when using tools like the Pokemon Showdown damage calculator.
-
 ## Usage
 
 1. Open the site.
-2. Take screenshots of each Pokemon in your team:
+2. Take your screenshots:
    - From the Pokemon Champions home page: **Train** → **Replica Teams** → **Share Your Battle Teams** → choose a team → **View Details**
-   - Take a screenshot of the **Moves & More** tab.
-   - Take a screenshot of the **Stats** tab.
-3. Upload the `Moves & More` screenshot.
-4. Upload the `Stats` screenshot.
-5. Enter your Gemini API key.
-6. Click `Import screenshots`.
-7. Review and manually fix any extracted fields if needed.
-8. Copy the generated Pokemon Showdown paste from the export panel.
+   - Screenshot the **Moves & More** tab (shows all 6 Pokemon)
+   - Screenshot the **Stats** tab (shows all 6 Pokemon)
+3. Upload both screenshots.
+4. Enter your Gemini API key.
+5. Click **Import screenshots**.
+6. Review the results in the Team Editor and fix any OCR mistakes.
+7. Copy the generated Showdown paste from the export panel.
 
 ## Gemini API Key
 
-A Gemini API key is required to use this tool.
+A Gemini API key is required.
 
 Get a free API key from Google AI Studio:
-
 https://aistudio.google.com/app/apikey
 
-The app includes a `Save key` option that stores the key in your browser's local storage.
+The app persists your key locally when **Save key** is enabled.
+
+## Toggles
+
+- **Auto-format Mega** — automatically rewrites species to the Mega form and swaps the ability when a Mega stone item is detected
+- **Fuzzy match** — corrects close OCR misspellings against the Showdown dataset using Levenshtein distance
+- **Form lookup** — asks Gemini to identify the Pokemon sprite and return the correct form name (Rotom-Wash, Lycanroc-Midnight, etc.)
 
 ## Privacy
 
-- Screenshots are processed in your browser.
-- If Gemini OCR is used, screenshot crops are sent directly from your browser to Google's Gemini API.
-- The Gemini API key is only saved locally in your browser when `Save key` is enabled.
-- There is no project backend server.
+- Your API key is stored in your browser's local storage when saved.
+- Screenshots are sent to Google's Gemini API for OCR processing.
+- No data is stored on any server.
 
 ## Validation
 
-The app shows warnings for fields that look invalid or unknown.
-
-Current validation uses Pokemon Showdown data as a baseline for Pokemon, move, item, and ability names. If Pokemon Champions has a different legal list, this may need a Champions-specific dataset later.
-
-## Current Limitations
-
-- OCR can make mistakes, so manual review is recommended.
-- The screenshot layout is currently tuned for the standard team detail screens.
-- Move validation currently checks move existence, not full per-Pokemon learnset legality.
+The app shows warnings for invalid species, items, abilities, moves, natures, or stat point totals. Validation uses Pokemon Showdown data as a baseline.
