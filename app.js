@@ -49,11 +49,11 @@ const NATURE_STAT_ALIASES = {
 };
 
 const NATURE_MAP = new Map([
-  ['atk:def', 'Lonely'], ['atk:spa', 'Adamant'], ['atk:spd', 'Naughty'], ['atk:spe', 'Brave'],
-  ['def:atk', 'Bold'], ['def:spa', 'Relaxed'], ['def:spd', 'Impish'], ['def:spe', 'Lax'],
-  ['spa:atk', 'Modest'], ['spa:def', 'Mild'], ['spa:spd', 'Rash'], ['spa:spe', 'Quiet'],
-  ['spd:atk', 'Calm'], ['spd:def', 'Gentle'], ['spd:spa', 'Careful'], ['spd:spe', 'Sassy'],
-  ['spe:atk', 'Timid'], ['spe:def', 'Hasty'], ['spe:spa', 'Jolly'], ['spe:spd', 'Naive']
+  ['atk:atk', 'Hardy'], ['atk:def', 'Lonely'], ['atk:spa', 'Adamant'], ['atk:spd', 'Naughty'], ['atk:spe', 'Brave'],
+  ['def:atk', 'Bold'], ['def:def', 'Docile'], ['def:spa', 'Relaxed'], ['def:spd', 'Impish'], ['def:spe', 'Lax'],
+  ['spa:atk', 'Modest'], ['spa:def', 'Mild'], ['spa:spa', 'Serious'], ['spa:spd', 'Rash'], ['spa:spe', 'Quiet'],
+  ['spd:atk', 'Calm'], ['spd:def', 'Gentle'], ['spd:spa', 'Careful'], ['spd:spd', 'Bashful'], ['spd:spe', 'Sassy'],
+  ['spe:atk', 'Timid'], ['spe:def', 'Hasty'], ['spe:spa', 'Jolly'], ['spe:spd', 'Naive'], ['spe:spe', 'Quirky']
 ]);
 
 const FORM_ALIASES = new Map([
