@@ -799,9 +799,8 @@ async function extractTeamFromScreenshot(kind, dataUrl) {
 - ability (string): the ability name
 - level (number): the numeric level
 - statPoints (object): { hp, atk, def, spa, spd, spe } — the small allocated stat point numbers (0-32 each, shown on the right side of each stat row). NOT the large base stat numbers.
-- nature (string|null): the Pokemon's NATURE name directly (e.g. "Brave", "Quiet", "Adamant"). Each stat row reads: stat name, then DIRECTLY TO THE RIGHT OF THE NAME is the arrow (if present), then the stat value. One stat name has a RED UP ARROW positioned immediately to its right (that's the boosted stat), another stat name has a BLUE DOWN ARROW positioned immediately to its right (that's the lowered stat). You know Pokemon natures; name which nature matches the boost/lower pattern.
-- natureUp (string|null): ONLY if nature is uncertain — the stat name that has a RED UP ARROW immediately to its right
-- natureDown (string|null): ONLY if nature is uncertain — the stat name that has a BLUE DOWN ARROW immediately to its right
+- natureUp (string|null): the exact stat name (from: HP, Attack, Defense, Sp. Atk, Sp. Def, or Speed) that has a RED ARROW (↑) directly to its right. Look carefully — the red arrow appears between the stat name and the stat value. REQUIRED.
+- natureDown (string|null): the exact stat name (from: HP, Attack, Defense, Sp. Atk, Sp. Def, or Speed) that has a BLUE ARROW (↓) directly to its right. The blue arrow appears between the stat name and the stat value. REQUIRED.
 
 Use exact English names as shown.`
     : `You are analyzing a Pokemon Champions "Moves & More" screen. It shows 6 Pokemon cards arranged in a grid (2 columns, 3 rows). Read left-to-right, top-to-bottom. Return a JSON object with a "team" array of exactly 6 objects. Each object MUST have the following fields. Do not skip any field.
@@ -843,7 +842,7 @@ function normalizeStatsTeam(team) {
         spd: clampInt(sp.spd ?? 0, 0, 32),
         spe: clampInt(sp.spe ?? 0, 0, 32),
       },
-      nature: entry.nature || natureFromBoostDrop(entry.natureUp, entry.natureDown),
+      nature: natureFromBoostDrop(entry.natureUp, entry.natureDown) || entry.nature,
       moves: ['', '', '', '']
     };
   });
