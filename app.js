@@ -778,10 +778,11 @@ async function callAI(prompt, base64, mimeType, dataUrl) {
 async function extractTeamFromScreenshot(kind, dataUrl) {
   const mimeType = dataUrl.match(/^data:(.*?);base64,/i)?.[1] || 'image/png';
   const base64 = dataUrl.split(',')[1];
+  const formHint = state.formLookup ? ' including the form suffix if applicable (e.g. Rotom-Wash, Lycanroc-Midnight, Maushold-Four). If base form, just the name.' : '.';
   const prompt = kind === 'stats'
     ? `You are analyzing a Pokemon Champions "Stats" screen. It shows 6 Pokemon cards arranged in a grid (2 columns, 3 rows). Read left-to-right, top-to-bottom. Return a JSON object with a "team" array of exactly 6 objects. Each object MUST have the following fields. Do not skip any field. If a value is not visible use null.
 
-- species (string): official species name including the form suffix if applicable (e.g. Rotom-Wash, Lycanroc-Midnight, Maushold-Four). If base form, just the name.
+- species (string): official species name${formHint}
 - item (string): the held item name
 - ability (string): the ability name
 - level (number): the numeric level
@@ -793,7 +794,7 @@ async function extractTeamFromScreenshot(kind, dataUrl) {
 Use exact English names as shown.`
     : `You are analyzing a Pokemon Champions "Moves & More" screen. It shows 6 Pokemon cards arranged in a grid (2 columns, 3 rows). Read left-to-right, top-to-bottom. Return a JSON object with a "team" array of exactly 6 objects. Each object MUST have the following fields. Do not skip any field.
 
-- species (string): official species name including the form suffix if applicable (e.g. Rotom-Wash, Lycanroc-Midnight, Maushold-Four). If base form, just the name.
+- species (string): official species name${formHint}
 - item (string): the held item name — shown on the card
 - ability (string): the ability name — shown on the card
 - moves (array of 4 strings): exactly 4 move names in order
