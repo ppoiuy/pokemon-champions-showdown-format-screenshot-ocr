@@ -1068,13 +1068,17 @@ async function loadShowdownData() {
 async function loadLearnsetData() {
   try {
     setWarnings([{ kind: 'bad', text: 'Loading moveset data...' }]);
-    const text = await (await fetch('https://play.pokemonshowdown.com/data/learnsets.js')).text();
+    const text = await (await fetch('https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/learnsets.ts')).text();
+    const jsText = text.replace(
+      /export const Learnsets:.*?= /,
+      'exports.Learnsets = '
+    );
     const exports = {};
-    new Function('exports', `${text}; return exports;`)(exports);
-    state.data.learnsets = exports.BattleLearnsets || {};
+    new Function('exports', jsText)(exports);
+    state.data.learnsets = exports.Learnsets || {};
     const sample = state.data.learnsets['pikachu'];
     if (!sample || !sample.learnset) {
-      throw new Error('Learnset data loaded but has unexpected format.');
+      throw new Error('Champions learnset data loaded but has unexpected format.');
     }
   } catch (e) {
     setWarnings([{ kind: 'bad', text: `Moveset data failed to load: ${e.message}. The learnset check will be unavailable.` }]);
