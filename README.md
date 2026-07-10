@@ -37,7 +37,7 @@ The app persists your key locally when **Save key** is enabled.
 
 If you run out of free Gemini tokens, use a different Google account for a fresh key.
 
-> **Nature detection**: Free Gemini (`gemini-2.5-flash`) has limited spatial reasoning and often misidentifies which stat has the red/blue arrow, producing incorrect natures. GPT and Claude are much more reliable for nature detection. OpenAI and Claude integrations are untested. Always double-check team details, especially natures, in the Team Editor.
+> **Nature detection**: Free Gemini (`gemini-2.5-flash`) has limited spatial reasoning and often misidentifies which stat has the red/blue arrow, producing incorrect natures. GPT and Claude may be much more reliable, however both are untested. Always double-check team details, especially natures, in the Team Editor.
 
 ## Toggles
 
