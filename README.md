@@ -23,13 +23,21 @@ Updated for Regulation M-B. New regulations may bring new Pokemon, moves, abilit
 
 An API key from a supported AI provider is required. Google Gemini has a free tier; OpenAI and Claude are paid.
 
+| Provider | Model | Cost |
+|---|---|---|
+| Google Gemini | `gemini-2.5-flash` | Free tier available |
+| OpenAI | `gpt-4o-mini` | Paid |
+| Claude | `claude-3-5-sonnet-20241022` | Paid |
+
 - [Google Gemini](https://aistudio.google.com/app/api-keys) — free tier available
 - [OpenAI](https://platform.openai.com/api-keys) — paid
 - [Claude](https://platform.claude.com/settings/keys) — paid
 
 The app persists your key locally when **Save key** is enabled.
 
-If you run out of free tokens, use a different Google account for a fresh Gemini key.
+If you run out of free Gemini tokens, use a different Google account for a fresh key.
+
+> **Nature detection**: Free Gemini (`gemini-2.5-flash`) has limited spatial reasoning and often misidentifies which stat has the red/blue arrow, producing incorrect natures. GPT-4o-mini and Claude are much more reliable for nature detection. Always double-check natures in the Team Editor.
 
 ## Toggles
 
@@ -42,6 +50,7 @@ If you run out of free tokens, use a different Google account for a fresh Gemini
 ## Warnings
 
 - OCR can make mistakes. Always review the extracted data before using it.
+- Nature detection is unreliable on free Gemini. GPT-4o-mini and Claude produce significantly better results.
 - AI form lookup is unreliable — the AI often misidentifies sprites or returns the wrong form suffix.
 - The tool uses Pokemon Showdown data for validation. Pokemon Champions may have a different legal move/item pool.
 - Stat points are capped at 32 per stat and 66 total based on Pokemon Champions rules.
